@@ -9,6 +9,7 @@
 #include "pte-util.h"
 #include "vm-util.h"
 
+// Function that creates a page table?
 pageTable::pageTable(){
 
   /*Core i7 has 9 bits worth of entries per page table*/
@@ -48,13 +49,18 @@ PTE pageTable::getEntry(unsigned long addr, size_t level){
           See also: getEntryIdFromAddr(addr, level)
   */
   PTE pte;
-  pte.pt = (pageTable *)0x0;     //base
+  pte.pt = (pageTable *)0x0;     //base?
 
+  PTE *curr_table;
+  uint32_t pt_idx;
 
-  //(VPN, VPO) = (addr[], addr[VM_PTABBITS:0])
+  for(int i; i < level; i++) {
+  // loop until reached the level we want
+    pt_idx = getEntryIdFromAddr(addr, i);
+    curr_table = pte.pt->table;
+    pte = curr_table[pt_idx];   // Update the pte what we are currently referring to 
+  }
 
-
-  
   return pte;
 
 }
@@ -73,9 +79,12 @@ unsigned pageTable::getEntryIdFromAddr(unsigned long addr, size_t level){
           is to have something like the following assertion in your code...
           assert( (addr & mask) <= pageTableSize );
   */
+  int level_shift = abs(level - 4);
+  int mask = 0x1FF;
+  int pte_idx = (addr >> ((9*level_shift) + 12)) & mask;
 
-  
+  assert( (addr & mask) <= pageTableSize );
 
-  return 0; 
+  return pte_idx; 
 
 }
