@@ -35,7 +35,7 @@ PTE pageTable::createEntry(unsigned long addr, size_t level){
 
 PTE pageTable::getEntryDirect(unsigned long index){
 
-  return table[index];   
+  return table[index];
 
 }
 
@@ -47,15 +47,17 @@ PTE pageTable::getEntry(unsigned long addr, size_t level){
 
           See also: getEntryIdFromAddr(addr, level)
   */
-  PTE pte;
-  pte.pt = (pageTable *)0x0; 
-  return pte;
+
+  PTE *curr_table = table;
+  unsigned long pt_idx = getEntryIdFromAddr(addr, i);
+
+  return table[pt_idx];
 
 }
 
 /* Input:  unmodified address.  
    Return: level-specific bit field from address that is index into 
-           to that level's page table
+           that level's page table
 */
 unsigned pageTable::getEntryIdFromAddr(unsigned long addr, size_t level){
  
@@ -68,6 +70,12 @@ unsigned pageTable::getEntryIdFromAddr(unsigned long addr, size_t level){
           assert( (addr & mask) <= pageTableSize );
   */
 
-  return 0; 
+  size_t level_shift = VM_PTABLEVS-level;
+  unsigned long level_mask = 0x1FF;
+  unsigned long pte_idx = (addr >> ((VM_PTABBITS*level_shift) + VM_PPOBITS)) & level_mask;
+
+  //assert( (addr & mask) <= pageTableSize );
+
+  return pte_idx; 
 
 }

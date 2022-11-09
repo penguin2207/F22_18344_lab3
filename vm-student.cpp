@@ -100,6 +100,8 @@ unsigned long VM::vmTranslate(unsigned long addr){
           *Assemble and return physical address
   */
   /*if(...){_tlb_hits++;} Don't forget to update the TLB hit counter*/
+  unsigned long PPO = addr & VM_PPOMASK;
+
   _accesses++; /*Don't forget to update the access counter*/
   assert(false && "Abort: vmTranslate not implemented");
   return 0; 
