@@ -52,9 +52,9 @@ PTE pageTable::getEntry(unsigned long addr, size_t level){
   pte.pt = (pageTable *)0x0;     //base?
 
   PTE *curr_table;
-  uint32_t pt_idx;
+  unsigned int pt_idx;
 
-  for(int i; i < level; i++) {
+  for(unsigned int i; i < level; i++) {
   // loop until reached the level we want
     pt_idx = getEntryIdFromAddr(addr, i);
     curr_table = pte.pt->table;
@@ -88,3 +88,4 @@ unsigned pageTable::getEntryIdFromAddr(unsigned long addr, size_t level){
   return pte_idx; 
 
 }
+ 
