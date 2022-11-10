@@ -37,7 +37,7 @@ PTE pageTable::createEntry(unsigned long addr, size_t level){
     pte.pte = new pageTableEntry(VM_PAGEDOUT); 
   }
   unsigned long idx = getEntryIdFromAddr(addr, level);
-  table[idx] = pte;
+  this->table[idx] = pte;
   
   return pte;
 
@@ -45,7 +45,7 @@ PTE pageTable::createEntry(unsigned long addr, size_t level){
 
 PTE pageTable::getEntryDirect(unsigned long index){
 
-  return table[index];
+  return this->table[index];
 
 }
 
@@ -60,7 +60,7 @@ PTE pageTable::getEntry(unsigned long addr, size_t level){
 
   unsigned long pt_idx = getEntryIdFromAddr(addr, level+1);
 
-  return table[pt_idx];
+  return this->table[pt_idx];
 
 }
 
