@@ -38,24 +38,21 @@ void VM::vmPageFaultHandler(pageTableEntry *pte){
           Update the PTE to store the new translation
   */
   
-  // Attempt to allocate a new page
+  /* Attempt to allocate a new page */
+  unsigned long ppn, addr;
+  unsigned long phys_addr = bumpAllocate();
 
-  // unsigned long phys_addr = bumpAllocate();
+  /* Case1 : Must replace page*/
+  if (phys_addr == 0x0)  {
+    replacePage();
+  }
 
-
-  // /* Must replace page*/
-  // if (phys_addr == 0x0)  {
-  //   replacePage();
-  // }
-
-  // // All physical pages are full
-  // replacePage()
-
-  // // Update the PTE 
-  // pte->ppn = 
-
-
-
+  /* Case 2: Allocation successful*/
+  std::pair<unsigned long, unsigned long> replace = replacePage();
+  addr = replace.first;
+  ppn = replace.second;
+  // Update the PTE 
+  pte->ppn = ppn;
 
   _page_faults++; /*Don't forget to update the page fault counter*/
 
@@ -171,7 +168,7 @@ unsigned long VM::vmTranslate(unsigned long addr){
   if (PPN == VM_PAGEDOUT) { // Paged out -> Page In 
     // Page In 
     vmPageFaultHandler(ppn_table);
-    _page_faults++;
+    // _page_faults++; // already counted in the faultHandler
     PPN = ppn_table->ppn;
     phys_addr = (PPN << VM_PPOBITS) || PPO;
     addToReplacementList(addr);
