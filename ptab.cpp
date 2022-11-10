@@ -28,7 +28,17 @@ pageTable::pageTable(){
 PTE pageTable::createEntry(unsigned long addr, size_t level){
 
   PTE pte;
-  pte.pt = (pageTable *)0x0;
+  // pte.pt = (pageTable *)0x0;
+
+  if (level != 4) {
+    pte.pt = new pageTable();
+  }
+  else {
+    pte.pte = new pageTableEntry(VM_PAGEDOUT); 
+  }
+  unsigned long idx = getEntryIdFromAddr(addr, level);
+  table[idx] = pte;
+  
   return pte;
 
 }
@@ -48,8 +58,7 @@ PTE pageTable::getEntry(unsigned long addr, size_t level){
           See also: getEntryIdFromAddr(addr, level)
   */
 
-  PTE *curr_table = table;
-  unsigned long pt_idx = getEntryIdFromAddr(addr, i);
+  unsigned long pt_idx = getEntryIdFromAddr(addr, level+1);
 
   return table[pt_idx];
 
