@@ -39,20 +39,21 @@ void VM::vmPageFaultHandler(pageTableEntry *pte){
   */
   
   /* Attempt to allocate a new page */
-  unsigned long ppn, addr;
+  unsigned long ppn;
   unsigned long phys_addr = bumpAllocate();
 
   /* Case1 : Must replace page*/
   if (phys_addr == 0x0)  {
     replacePage();
+    std::pair<unsigned long, unsigned long> replace = replacePage();
+    ppn = replace.second;
+    pte->ppn = ppn; // Update the PTE 
   }
 
   /* Case 2: Allocation successful*/
-  std::pair<unsigned long, unsigned long> replace = replacePage();
-  addr = replace.first;
-  ppn = replace.second;
-  // Update the PTE 
-  pte->ppn = ppn;
+  else {
+    pte->ppn = phys_addr & VM_PPNMASK;
+  }
 
   _page_faults++; /*Don't forget to update the page fault counter*/
 
