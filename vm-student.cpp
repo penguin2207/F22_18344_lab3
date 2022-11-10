@@ -59,7 +59,7 @@ void VM::vmPageFaultHandler(pageTableEntry *pte){
 
 
 
-  assert(false && "vmPageFaultHandler not implemented");
+  // assert(false && "vmPageFaultHandler not implemented");
 }
 
 /*
@@ -88,8 +88,48 @@ void VM::vmMap(unsigned long vaddr, size_t size){
   */
   // 9 + 9 + 9 + 9 + 12 (VPO)  // What is the case of the size greater than the page size? Are teh pages consecutive?
 
+  std::cerr << "[VM: Mapping Region " << std::hex << vaddr << " " << std::dec << size << "B]" << std::endl;
 
-  assert(false && "Abort: vmMap() unimplemented");
+  size_t size_count = size;
+  size_t entry_size = sizeof(PTE);
+  size_t curr_addr = vaddr;
+  
+  pageTable pT = *(root.pt);
+  // pageTableEntry *ppn_table;
+  PTE pte;
+  pte.pt = (pageTable *)0x0; 
+
+  while(size_count>0){
+    //Use curr_addr to check for existing entry/create
+
+    for (int i  = 0; i < (int) levels; i++) {
+      pte = pT.getEntry(curr_addr, i);
+      if (i < (int)(levels-1)) {
+        if (!pte.pt) {
+          pte.pt=pT.createEntry(curr_addr, i).pt;
+        }
+        else if ((unsigned long)(pte.pt) == VM_PAGEDOUT) {
+          pte.pt=pT.createEntry(curr_addr, i).pt;
+        }
+        pT = *pte.pt;
+      } else {
+        
+        if(!pte.pte){
+          pte.pte = pT.createEntry(curr_addr, i).pte;
+        }
+        if (pte.pte->ppn == (unsigned long)0x0) {
+          pte.pte->ppn = VM_PAGEDOUT;
+        }
+      }
+    }
+    pT = *(root.pt);
+    size_count-=entry_size;
+    curr_addr+=entry_size;
+
+  }
+
+
+  // assert(false && "Abort: vmMap() unimplemented");
 }
 
 /*
@@ -145,8 +185,8 @@ unsigned long VM::vmTranslate(unsigned long addr){
   // }
 
   for (unsigned int i  = 0; i < levels; i++) {  // Traversing up to level 3
-    pte = pt.getEntry(addr, i);
-    if (i != levels-1) {
+    pte = pt.getEntry(addr, i); // Level in our function is 1-4
+    if (i != levels - 1) {
       if (pte.pt == NULL) {
         _page_faults++; // segfault
         return -1;
@@ -163,6 +203,10 @@ unsigned long VM::vmTranslate(unsigned long addr){
     }
   }
 
+  if (ppn_table == NULL) {
+    _page_faults++; // segfault
+    return -1;
+  }
   PPN = ppn_table->ppn;
   
   // Check PPN
@@ -185,7 +229,7 @@ unsigned long VM::vmTranslate(unsigned long addr){
   
   /*if(...){_tlb_hits++;} Don't forget to update the TLB hit counter*/
   _accesses++; /*Don't forget to update the access counter*/
-  assert(false && "Abort: vmTranslate not implemented");
+  // assert(false && "Abort: vmTranslate not implemented");
   return phys_addr;
 }
 

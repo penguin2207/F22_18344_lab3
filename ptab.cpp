@@ -31,13 +31,13 @@ PTE pageTable::createEntry(unsigned long addr, size_t level){
   PTE pte;
   pte.pt = (pageTable *)0x0;
 
-  if (level != 4) {
+  if (level != VM_PTABLEVS-1) {
     pte.pt = new pageTable();
   }
   else {
     pte.pte = new pageTableEntry(VM_PAGEDOUT); 
   }
-  int idx = getEntryIdFromAddr(addr, level);
+  int idx = getEntryIdFromAddr(addr, level+1);
   this->table[idx] = pte;
   
   return pte;
@@ -46,7 +46,7 @@ PTE pageTable::createEntry(unsigned long addr, size_t level){
 
 PTE pageTable::getEntryDirect(unsigned long index){
 
-  return table[index];   
+  return table[index];            // Does it refer to the object?
 
 }
 
@@ -73,7 +73,7 @@ PTE pageTable::getEntry(unsigned long addr, size_t level){
 
 
   unsigned int idx;
-  idx = getEntryIdFromAddr(addr, level);
+  idx = getEntryIdFromAddr(addr, level+1);
   pte = this->table[idx];
 
   return pte;
@@ -95,9 +95,9 @@ unsigned pageTable::getEntryIdFromAddr(unsigned long addr, size_t level){
           is to have something like the following assertion in your code...
           assert( (addr & mask) <= pageTableSize );
   */
-  int level_shift = abs(level - 4);
+  int level_shift = VM_PTABLEVS - level;
   int mask = 0x1FF;
-  int pte_idx = (addr >> ((9*level_shift) + 12)) & mask;
+  int pte_idx = (addr >> ((VM_PTABBITS*level_shift) + VM_PPOBITS)) & mask;
 
   assert( (addr & mask) <= pageTableSize );
 
