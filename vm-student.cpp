@@ -37,7 +37,30 @@ void VM::vmPageFaultHandler(pageTableEntry *pte){
           a page.
           Update the PTE to store the new translation
   */
+  
+  // Attempt to allocate a new page
+
+  // unsigned long phys_addr = bumpAllocate();
+
+
+  // /* Must replace page*/
+  // if (phys_addr == 0x0)  {
+  //   replacePage();
+  // }
+
+  // // All physical pages are full
+  // replacePage()
+
+  // // Update the PTE 
+  // pte->ppn = 
+
+
+
+
   _page_faults++; /*Don't forget to update the page fault counter*/
+
+
+
   assert(false && "vmPageFaultHandler not implemented");
 }
 
@@ -102,10 +125,70 @@ unsigned long VM::vmTranslate(unsigned long addr){
           *Update TLB to cache new translation if you have a TLB 
           *Assemble and return physical address
   */
+
+  // Extract PPO
+  unsigned long VPO, PPN, PPO;
+  //(VPN, VPO) = (addr[63:12], addr[11:0]);
+  // unsigned long VM_VPNMASK = 0xFFFFFF;
+  // VPN = (addr >> 12) & VM_VPNMASK;
+  VPO = addr & VM_PPOMASK;
+  PPO = VPO; 
+
+  pageTable pt = *(root.pt);
+  pageTableEntry *ppn_table;
+  PTE pte;
+  unsigned long phys_addr;
+  pte.pt = (pageTable *)0x0; 
+  
+
+  /* We can ignore this case */
+  // if (&root == NULL || root.pt == NULL) {
+  //   _page_faults++;
+  // }
+
+  for (unsigned int i  = 0; i < levels; i++) {  // Traversing up to level 3
+    pte = pt.getEntry(addr, i);
+    if (i != levels-1) {
+      if (pte.pt == NULL) {
+        _page_faults++; // segfault
+        return -1;
+      }
+      else if ((unsigned long)(pte.pt) == VM_PAGEDOUT) {
+        /* This case would not happen in the simulation*/
+        _page_faults++;
+        return -1;
+      }
+      pt = *pte.pt;  //the next level page table
+    }
+    else { // when i = 3 (level = 4)
+      ppn_table = pte.pte;
+    }
+  }
+
+  PPN = ppn_table->ppn;
+  
+  // Check PPN
+  if (PPN == VM_PAGEDOUT) { // Paged out -> Page In 
+    // Page In 
+    vmPageFaultHandler(ppn_table);
+    _page_faults++;
+    PPN = ppn_table->ppn;
+    phys_addr = (PPN << VM_PPOBITS) || PPO;
+    addToReplacementList(addr);
+    return phys_addr;
+  }
+  else if (PPN == (unsigned long)0x0) {  // Unmapped 
+    /* In real life we call segfault */
+    _page_faults++;
+    return -1;
+  }
+  // Else -- already exist
+  phys_addr = (PPN << VM_PPOBITS) || PPO;
+  
   /*if(...){_tlb_hits++;} Don't forget to update the TLB hit counter*/
   _accesses++; /*Don't forget to update the access counter*/
   assert(false && "Abort: vmTranslate not implemented");
-  return 0; 
+  return phys_addr;
 }
 
 

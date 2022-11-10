@@ -29,7 +29,7 @@ pageTable::pageTable(){
 PTE pageTable::createEntry(unsigned long addr, size_t level){   
 
   PTE pte;
-  // pte.pt = (pageTable *)0x0;
+  pte.pt = (pageTable *)0x0;
 
   if (level != 4) {
     pte.pt = new pageTable();
@@ -59,10 +59,10 @@ PTE pageTable::getEntry(unsigned long addr, size_t level){
           See also: getEntryIdFromAddr(addr, level)
   */
   PTE pte;
-  pte.pt = (pageTable *)0x0;     //base? is it the VM_MINADDR?
+  pte.pt = (pageTable *)0x0;     // Need this just to have it being able to compile
 
-  PTE *curr_table;
-  unsigned int pt_idx;
+  // PTE *curr_table;
+  // unsigned int pt_idx;
 
   // for(unsigned int i; i < level; i++) {
   // // loop until reached the level we want
@@ -70,8 +70,6 @@ PTE pageTable::getEntry(unsigned long addr, size_t level){
   //   curr_table = pte.pt->table;
   //   pte = curr_table[pt_idx];   // Update the pte what we are currently referring to 
   // }
-
-  // return pte;
 
 
   unsigned int idx;

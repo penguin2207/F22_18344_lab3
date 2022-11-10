@@ -8,7 +8,7 @@ public:
 
   // Added 
   // unsigned long vpn;
-  unsigned int perm;   // How many permission mode/flag do we have
+  // unsigned int perm;   // How many permission mode/flag do we have
 
 
 };
