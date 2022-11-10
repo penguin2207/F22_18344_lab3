@@ -52,7 +52,7 @@ void VM::vmPageFaultHandler(pageTableEntry *pte){
 
   /* Case 2: Allocation successful*/
   else {
-    pte->ppn = phys_addr & VM_PPNMASK;
+    pte->ppn = (phys_addr & VM_PPNMASK) >> 12;
   }
 
   _page_faults++; /*Don't forget to update the page fault counter*/
