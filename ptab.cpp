@@ -58,7 +58,7 @@ PTE pageTable::getEntry(unsigned long addr, size_t level){
           See also: getEntryIdFromAddr(addr, level)
   */
 
-  unsigned long pt_idx = getEntryIdFromAddr(addr, level+1);
+  unsigned long pt_idx = getEntryIdFromAddr(addr, level);
 
   return this->table[pt_idx];
 

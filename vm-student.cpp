@@ -56,7 +56,7 @@ void VM::vmPageFaultHandler(pageTableEntry *pte){
   }
 
   _page_faults++; /*Don't forget to update the page fault counter*/
-  assert(false && "vmPageFaultHandler not implemented");
+  //assert(false && "vmPageFaultHandler not implemented");
 }
 
 /*
@@ -81,11 +81,9 @@ void VM::vmMap(unsigned long vaddr, size_t size){
   std::cerr << "[VM: Mapping Region " << std::hex << vaddr << " " << std::dec << size << "B]" << std::endl;
 
   size_t size_count = size;
-  size_t entry_size = sizeof(PTE);
   size_t curr_addr = vaddr;
   
   pageTable pT = *(root.pt);
-  pageTableEntry *ppn_table;
   PTE pte;
   pte.pt = (pageTable *)0x0; 
 
@@ -113,14 +111,14 @@ void VM::vmMap(unsigned long vaddr, size_t size){
       }
     }
     pT = *(root.pt);
-    size_count-=entry_size;
-    curr_addr+=entry_size;
+    size_count-=1;
+    curr_addr+=1;
   }
   
   /*TODO: Compute the number of pages in the region to be mapped
           Create an entry in the page table for each page to be mapped 
   */
-  assert(false && "Abort: vmMap() unimplemented");
+  //assert(false && "Abort: vmMap() unimplemented");
 }
 
 /*
@@ -216,7 +214,7 @@ unsigned long VM::vmTranslate(unsigned long addr){
   
   /*if(...){_tlb_hits++;} Don't forget to update the TLB hit counter*/
   _accesses++; /*Don't forget to update the access counter*/
-  assert(false && "Abort: vmTranslate not implemented");
+  //assert(false && "Abort: vmTranslate not implemented");
   return phys_addr;
 }
 

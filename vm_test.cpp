@@ -9,32 +9,32 @@ int main(int argc, char *argv[]){
   void *p = (void*)0x0; 
   vm->vmMap((unsigned long)p,8192);
   
-  std::cerr << "[TEST: OK; page fault]" << std::endl;
+  std::cerr << "[TEST1: OK; page fault]" << std::endl;
   vm->pageStoreSingle((unsigned long)p+0,0xfeefee);
   
-  std::cerr << "[TEST: OK; ]" << std::endl;
+  std::cerr << "[TEST2: OK; ]" << std::endl;
   vm->pageStoreSingle((unsigned long)p+0,0xfeefee);
 
-  std::cerr << "[TEST: OK; ]" << std::endl;
+  std::cerr << "[TEST3: OK; ]" << std::endl;
   vm->pageStoreSingle((unsigned long)p+9,0xfeefee);
   
-  std::cerr << "[TEST: OK; ]" << std::endl;
+  std::cerr << "[TEST4: OK; ]" << std::endl;
   vm->pageStoreSingle((unsigned long)p+4095,0xfeefee);
   
-  std::cerr << "[TEST: OK; page fault]" << std::endl;
+  std::cerr << "[TEST5: OK; page fault]" << std::endl;
   vm->pageStoreSingle((unsigned long)p+4096,0xfeefee);
   
-  std::cerr << "[TEST: OK; ]" << std::endl;
+  std::cerr << "[TEST6: OK; ]" << std::endl;
   vm->pageStoreSingle((unsigned long)p+4096,0xfeefee);
   
-  std::cerr << "[TEST: OK; ]" << std::endl;
+  std::cerr << "[TEST7: OK; ]" << std::endl;
   vm->pageStoreSingle((unsigned long)p+4097,0xfeefee);
   
-  std::cerr << "[TEST: OK; ]" << std::endl;
+  std::cerr << "[TEST8: OK; ]" << std::endl;
   vm->pageStoreSingle((unsigned long)p+5097,0xfeefee);
 
-  /*std::cerr << "[TEST: SEGFAULT; ]" << std::endl;
-  vm->pageStoreSingle((unsigned long)p+8193,0xfeefee);*/
+  std::cerr << "[TEST: SEGFAULT; ]" << std::endl;
+  vm->pageStoreSingle((unsigned long)p+8193,0xfeefee);
   
   p = (void*)0x18000; 
   vm->vmMap((unsigned long)p,65536);
