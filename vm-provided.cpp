@@ -22,6 +22,7 @@ VM::VM(){
   _accesses = 0;
   _tlb_hits = 0;
   _page_faults = 0;
+  _segfaults = 0;
   std::cerr << "done allocating VM and TLB" << std::endl;
 
 }
