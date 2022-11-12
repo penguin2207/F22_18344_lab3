@@ -25,6 +25,7 @@ private:
   unsigned _tlb_hits;
   unsigned _accesses;
   unsigned _page_faults;
+  unsigned _segfaults;
 
 public:
 
@@ -41,6 +42,7 @@ public:
   unsigned getNumAcc() const { return _accesses; };
   unsigned getNumTlbHit() const { return _tlb_hits; };
   unsigned getNumPgFault() const { return _page_faults; };
+  unsigned getNumSegfault() const { return _segfaults; } ;
 
   /*TODO: implement these*/
   unsigned long vmTranslate(unsigned long addr);

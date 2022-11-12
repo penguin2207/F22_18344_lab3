@@ -31,7 +31,7 @@ PTE pageTable::createEntry(unsigned long addr, size_t level){
   PTE pte;
   pte.pt = (pageTable *)0x0;
 
-  if (level < 4) {
+  if (level < VM_PTABLEVS-1) {
     pte.pt = new pageTable();
   }
   else {

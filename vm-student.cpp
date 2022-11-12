@@ -53,7 +53,7 @@ void VM::vmPageFaultHandler(pageTableEntry *pte){
 
   /* Case 2: Allocation successful*/
   else {
-    pte->ppn = (phys_addr << 12) & VM_PPNMASK;
+    pte->ppn = (phys_addr & VM_PPNMASK) >> 12;
   }
 
   _page_faults++; /*Don't forget to update the page fault counter*/
@@ -82,6 +82,7 @@ void VM::vmMap(unsigned long vaddr, size_t size){
   std::cerr << "[VM: Mapping Region " << std::hex << vaddr << " " << std::dec << size << "B]" << std::endl;
 
   size_t size_count = size;
+  size_t entry_size = 1<<VM_PPOBITS;
   size_t curr_addr = vaddr;
   
   pageTable pT = *(root.pt);
@@ -94,6 +95,7 @@ void VM::vmMap(unsigned long vaddr, size_t size){
     for (int i  = 0; i < (int) levels; i++) {
       pte = pT.getEntry(curr_addr, i);
       if (i < (int)(levels-1)) {
+        printf("in if\n");
         if (!pte.pt) {
           pte.pt=pT.createEntry(curr_addr, i).pt;
         }
@@ -102,18 +104,21 @@ void VM::vmMap(unsigned long vaddr, size_t size){
         }
         pT = *pte.pt;
       } else {
+        printf("in else\n");
         
         if(!pte.pte){
+          printf("creating in else\n");
           pte.pte = pT.createEntry(curr_addr, i).pte;
         }
         if (pte.pte->ppn == (unsigned long)0x0) {
+          printf("mapping unmapped in else\n");
           pte.pte->ppn = VM_PAGEDOUT;
         }
       }
     }
     pT = *(root.pt);
-    size_count--;
-    curr_addr++;
+    size_count-=entry_size;
+    curr_addr+=entry_size;
   }
   
   /*TODO: Compute the number of pages in the region to be mapped
@@ -169,15 +174,18 @@ unsigned long VM::vmTranslate(unsigned long addr){
   pte.pt = (pageTable *)0x0; 
   
 
+  _accesses++; /*Don't forget to update the access counter*/
+
   /* We can ignore this case */
   // if (&root == NULL || root.pt == NULL) {
   //   _page_faults++;
   // }
+
   for (unsigned int i  = 0; i < levels; i++) {  // Traversing up to level 3
-    pte = pt.getEntry(addr, i);
-    if (i < levels-1) {
+    pte = pt.getEntry(addr, i); // Level in our function is 1-4
+    if (i != levels - 1) {
       if (pte.pt == NULL) {
-        _page_faults++; // segfault
+        _segfaults++; // segfault
         return -1;
       }
       else if ((unsigned long)(pte.pt) == VM_PAGEDOUT) {
@@ -191,15 +199,15 @@ unsigned long VM::vmTranslate(unsigned long addr){
       ppn_table = pte.pte;
     }
   }
-  if(ppn_table){
-    PPN = ppn_table->ppn;
-  }else{
-    _page_faults++; // segfault
+
+  if (ppn_table == NULL) {
+    _segfaults++; // segfault
     return -1;
   }
+  PPN = ppn_table->ppn;
   
   // Check PPN
-  if (PPN == VM_PAGEDOUT) { // Paged out -> Page In 
+  if (PPN == VM_PAGEDOUT) { // Last level paged out -> Page In 
     // Page In 
     vmPageFaultHandler(ppn_table);
     // _page_faults++; // already counted in the faultHandler
@@ -210,14 +218,11 @@ unsigned long VM::vmTranslate(unsigned long addr){
   }
   else if (PPN == (unsigned long)0x0) {  // Unmapped 
     /* In real life we call segfault */
-    _page_faults++;
+    _segfaults++;
     return -1;
   }
   // Else -- already exist
   phys_addr = (PPN << VM_PPOBITS) || PPO;
-  
-  /*if(...){_tlb_hits++;} Don't forget to update the TLB hit counter*/
-  _accesses++; /*Don't forget to update the access counter*/
   //assert(false && "Abort: vmTranslate not implemented");
   return phys_addr;
 }

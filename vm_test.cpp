@@ -1,5 +1,7 @@
 #include <iostream>
 #include "vm.h"
+#include <stdlib.h>
+#include <stdio.h>
 
 
 int main(int argc, char *argv[]){
@@ -36,19 +38,34 @@ int main(int argc, char *argv[]){
   std::cerr << "[TEST: SEGFAULT; ]" << std::endl;
   vm->pageStoreSingle((unsigned long)p+8193,0xfeefee);
   
-  p = (void*)0x18000; 
-  vm->vmMap((unsigned long)p,65536);
-  for(int i = 0; i < 65536; i+=1024){
-    vm->pageStoreSingle((unsigned long)p+i,0xfeefee);
-  }
+  // p = (void*)0x18000; 
+  // vm->vmMap((unsigned long)p,65536);
+  // for(int i = 0; i < 65536; i+=1024){
+  //   vm->pageStoreSingle((unsigned long)p+i,0xfeefee);
+  // }
 
+  
   unsigned accesses = vm->getNumAcc();
   unsigned TLB_hits = vm->getNumTlbHit();
   unsigned page_faults = vm->getNumPgFault();
+  unsigned segfaults = vm->getNumSegfault();
 
-  std::cerr << "[STATS:]" << std::endl;
+  printf("accesses = %d \n", accesses);
+  printf("TLB_hits = %d \n", TLB_hits);
+  printf("Page faults = %d \n", page_faults);
+  printf("Segfaults = %d \n", segfaults);
+
+
+  std::cout << "[COUT STATS:]" << std::endl;
+  std::cout << "number of virtual memory accesses: " << accesses << std::endl;
+  std::cout << "number of TLB hits: " << TLB_hits << std::endl;
+  std::cout << "number of page faults: " << page_faults << std::endl;
+  std::cout << "number of segfaults: " << segfaults << std::endl;
+
+  std::cerr << "[CERR STATS:]" << std::endl;
   std::cerr << "number of virtual memory accesses: " << accesses << std::endl;
   std::cerr << "number of TLB hits: " << TLB_hits << std::endl;
   std::cerr << "number of page faults: " << page_faults << std::endl;
+  std::cerr << "number of segfaults: " << segfaults << std::endl;
 
 }
