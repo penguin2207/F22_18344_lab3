@@ -3,6 +3,7 @@
 #include <limits>
 #include <stdlib.h>
 #include <string.h>
+#include <stdio.h>
 
 #include "ptab.h"
 #include "pte.h"
@@ -28,15 +29,15 @@ pageTable::pageTable(){
 PTE pageTable::createEntry(unsigned long addr, size_t level){
 
   PTE pte;
-  // pte.pt = (pageTable *)0x0;
+  pte.pt = (pageTable *)0x0;
 
-  if (level != 4) {
+  if (level < 4) {
     pte.pt = new pageTable();
   }
   else {
     pte.pte = new pageTableEntry(VM_PAGEDOUT); 
   }
-  unsigned long idx = getEntryIdFromAddr(addr, level);
+  unsigned long idx = getEntryIdFromAddr(addr, level+1);
   this->table[idx] = pte;
   
   return pte;
@@ -45,7 +46,7 @@ PTE pageTable::createEntry(unsigned long addr, size_t level){
 
 PTE pageTable::getEntryDirect(unsigned long index){
 
-  return this->table[index];
+  return table[index];
 
 }
 
@@ -58,7 +59,7 @@ PTE pageTable::getEntry(unsigned long addr, size_t level){
           See also: getEntryIdFromAddr(addr, level)
   */
 
-  unsigned long pt_idx = getEntryIdFromAddr(addr, level);
+  unsigned long pt_idx = getEntryIdFromAddr(addr, level+1);
 
   return this->table[pt_idx];
 
@@ -83,7 +84,8 @@ unsigned pageTable::getEntryIdFromAddr(unsigned long addr, size_t level){
   unsigned long level_mask = 0x1FF;
   unsigned long pte_idx = (addr >> ((VM_PTABBITS*level_shift) + VM_PPOBITS)) & level_mask;
 
-  //assert( (addr & mask) <= pageTableSize );
+  assert( (addr & level_mask) <= pageTableSize );
+
 
   return pte_idx; 
 

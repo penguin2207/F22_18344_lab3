@@ -10,6 +10,7 @@
 #include <limits>
 #include <stdlib.h>
 #include <string.h>
+#include <stdio.h>
 
 VM *vm;
 
@@ -111,8 +112,8 @@ void VM::vmMap(unsigned long vaddr, size_t size){
       }
     }
     pT = *(root.pt);
-    size_count-=1;
-    curr_addr+=1;
+    size_count--;
+    curr_addr++;
   }
   
   /*TODO: Compute the number of pages in the region to be mapped
@@ -172,10 +173,9 @@ unsigned long VM::vmTranslate(unsigned long addr){
   // if (&root == NULL || root.pt == NULL) {
   //   _page_faults++;
   // }
-
   for (unsigned int i  = 0; i < levels; i++) {  // Traversing up to level 3
     pte = pt.getEntry(addr, i);
-    if (i != levels-1) {
+    if (i < levels-1) {
       if (pte.pt == NULL) {
         _page_faults++; // segfault
         return -1;
@@ -191,8 +191,12 @@ unsigned long VM::vmTranslate(unsigned long addr){
       ppn_table = pte.pte;
     }
   }
-
-  PPN = ppn_table->ppn;
+  if(ppn_table){
+    PPN = ppn_table->ppn;
+  }else{
+    _page_faults++; // segfault
+    return -1;
+  }
   
   // Check PPN
   if (PPN == VM_PAGEDOUT) { // Paged out -> Page In 
