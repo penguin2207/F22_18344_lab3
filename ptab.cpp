@@ -3,13 +3,13 @@
 #include <limits>
 #include <stdlib.h>
 #include <string.h>
+#include <stdio.h>
 
 #include "ptab.h"
 #include "pte.h"
 #include "pte-util.h"
 #include "vm-util.h"
 
-// Function that creates a page table?
 pageTable::pageTable(){
 
   /*Core i7 has 9 bits worth of entries per page table*/
@@ -26,18 +26,18 @@ pageTable::pageTable(){
 
 }
 
-PTE pageTable::createEntry(unsigned long addr, size_t level){   
+PTE pageTable::createEntry(unsigned long addr, size_t level){
 
   PTE pte;
   pte.pt = (pageTable *)0x0;
 
-  if (level != VM_PTABLEVS-1) {
+  if (level < VM_PTABLEVS-1) {
     pte.pt = new pageTable();
   }
   else {
     pte.pte = new pageTableEntry(VM_PAGEDOUT); 
   }
-  int idx = getEntryIdFromAddr(addr, level+1);
+  unsigned long idx = getEntryIdFromAddr(addr, level+1);
   this->table[idx] = pte;
   
   return pte;
@@ -46,7 +46,7 @@ PTE pageTable::createEntry(unsigned long addr, size_t level){
 
 PTE pageTable::getEntryDirect(unsigned long index){
 
-  return table[index];            // Does it refer to the object?
+  return table[index];
 
 }
 
@@ -58,32 +58,16 @@ PTE pageTable::getEntry(unsigned long addr, size_t level){
 
           See also: getEntryIdFromAddr(addr, level)
   */
-  PTE pte;
-  pte.pt = (pageTable *)0x0;     // Need this just to have it being able to compile
 
-  // PTE *curr_table;
-  // unsigned int pt_idx;
+  unsigned long pt_idx = getEntryIdFromAddr(addr, level+1);
 
-  // for(unsigned int i; i < level; i++) {
-  // // loop until reached the level we want
-  //   pt_idx = getEntryIdFromAddr(addr, i);
-  //   curr_table = pte.pt->table;
-  //   pte = curr_table[pt_idx];   // Update the pte what we are currently referring to 
-  // }
-
-
-  unsigned int idx;
-  idx = getEntryIdFromAddr(addr, level+1);
-  pte = this->table[idx];
-
-  return pte;
-
+  return this->table[pt_idx];
 
 }
 
 /* Input:  unmodified address.  
    Return: level-specific bit field from address that is index into 
-           to that level's page table
+           that level's page table
 */
 unsigned pageTable::getEntryIdFromAddr(unsigned long addr, size_t level){
  
@@ -95,13 +79,14 @@ unsigned pageTable::getEntryIdFromAddr(unsigned long addr, size_t level){
           is to have something like the following assertion in your code...
           assert( (addr & mask) <= pageTableSize );
   */
-  int level_shift = VM_PTABLEVS - level;
-  int mask = 0x1FF;
-  int pte_idx = (addr >> ((VM_PTABBITS*level_shift) + VM_PPOBITS)) & mask;
 
-  assert( (addr & mask) <= pageTableSize );
+  size_t level_shift = VM_PTABLEVS-level;
+  unsigned long level_mask = 0x1FF;
+  unsigned long pte_idx = (addr >> ((VM_PTABBITS*level_shift) + VM_PPOBITS)) & level_mask;
+
+  assert( (addr & level_mask) <= pageTableSize );
+
 
   return pte_idx; 
 
 }
- 

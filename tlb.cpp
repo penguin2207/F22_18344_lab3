@@ -8,7 +8,7 @@
 #include <string.h>
 #include <stdio.h>
 
-TLB::TLB()   // To do: Data structure?
+TLB::TLB()
 {
   misses = 0;
   evictions = 0;
@@ -53,14 +53,13 @@ bool TLB::lookup(unsigned long addr, unsigned long &PPN){
   unsigned long tagMask = 0xFFFFFFFF << (set_bits + block_bits);
   unsigned long tagBits = (addr & tagMask) >> (set_bits + block_bits);
 
-
   for (int i = 0; i < (int)lines; ++i) {
         if (cache[setBits][i].valid &&
             (cache[setBits][i].tag == tagBits)) {  // check the cache tag
             PPN = cache[setBits][i].ppn;
             return true;
         }
-    }
+  }
 
   return false;
 
@@ -71,7 +70,7 @@ void TLB::update(unsigned long addr, unsigned long new_PPN){
   /*TODO: Implement a TLB update here using the 
           virtual address and new PPN*/
 
-  unsigned long setBits = (addr & (setMask << block_bits)) >> block_bits;
+   unsigned long setBits = (addr & (setMask << block_bits)) >> block_bits;
   unsigned long offBits = addr & offMask;
   unsigned long tagMask = 0xFFFFFFFF << (set_bits + block_bits);
 

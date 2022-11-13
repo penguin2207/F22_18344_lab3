@@ -1,9 +1,9 @@
 #pragma once
 class pageTable;
 class pageTableEntry;
-typedef union pte_t{       // Question: why union?
+typedef union pte_t{
 
-  pageTable *pt;                
+  pageTable *pt;
   pageTableEntry *pte;
 
 } PTE;

@@ -28,7 +28,6 @@ private:
   unsigned _page_faults;
   unsigned _segfaults;
 
-
 public:
 
   PTE root; 
