@@ -174,20 +174,13 @@ unsigned long VM::vmTranslate(unsigned long addr){
   PTE pte;
   unsigned long phys_addr;
   pte.pt = (pageTable *)0x0; 
-<<<<<<< Updated upstream
-=======
   bool tlbHit = false;
->>>>>>> Stashed changes
+
+  if(_TLB->lookup(addr, refPPN))
+    tlbHit = true;
 
   _accesses++; /*Don't forget to update the access counter*/
 
-  if(_TLB->lookup(addr, refPPN)) {
-    // tlbHit = true;
-    _tlb_hits++;
-    return refPPN;
-  }
-
-  
   /* We can ignore this case */
   // if (&root == NULL || root.pt == NULL) {
   //   _page_faults++;
@@ -217,6 +210,8 @@ unsigned long VM::vmTranslate(unsigned long addr){
     return -1;
   }
   PPN = ppn_table->ppn;
+
+
   
   // Check PPN
   if (PPN == VM_PAGEDOUT) { // Last level paged out -> Page In 
@@ -226,7 +221,7 @@ unsigned long VM::vmTranslate(unsigned long addr){
     PPN = ppn_table->ppn;
     phys_addr = (PPN << VM_PPOBITS) || PPO;
     addToReplacementList(addr);
-    // return phys_addr;
+    return phys_addr;
   }
   else if (PPN == (unsigned long)0x0) {  // Unmapped 
     /* In real life we call segfault */
@@ -235,22 +230,13 @@ unsigned long VM::vmTranslate(unsigned long addr){
   }
   // Else -- already exist
   phys_addr = (PPN << VM_PPOBITS) || PPO;
-<<<<<<< Updated upstream
-  
-  /*if(...){_tlb_hits++;} Don't forget to update the TLB hit counter*/
-  
-  // assert(false && "Abort: vmTranslate not implemented");
-=======
 
-  // if((tlbHit) && (refPPN == phys_addr))
-  //   _tlb_hits++;
-  // else {
-  //   _tlb_misses++;
-  //   _TLB->update(addr, phys_addr);
-  // }
-  
-  _tlb_misses++;
-  _TLB->update(addr, phys_addr);
+  if((tlbHit) && (refPPN == phys_addr))
+    _tlb_hits++;
+  else {
+    _tlb_misses++;
+    _TLB->update(addr, phys_addr);
+  }
 
   //assert(false && "Abort: vmTranslate not implemented");
 >>>>>>> Stashed changes

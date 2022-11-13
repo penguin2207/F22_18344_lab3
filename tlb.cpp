@@ -2,8 +2,6 @@
 
 TLB::TLB()   // To do: Data structure?
 {
-<<<<<<< Updated upstream
-=======
   misses = 0;
   evictions = 0;
   sets = TLB_SET;
@@ -34,7 +32,6 @@ TLB::TLB()   // To do: Data structure?
         }
     }
 
->>>>>>> Stashed changes
 }
 
 bool TLB::lookup(unsigned long addr, unsigned long &PPN){
@@ -44,8 +41,6 @@ bool TLB::lookup(unsigned long addr, unsigned long &PPN){
           your TLB lookup is a hit
   */
 
-<<<<<<< Updated upstream
-=======
   unsigned long setBits = (addr & (setMask << block_bits)) >> block_bits;
   unsigned long tagMask = 0xFFFFFFFF << (set_bits + block_bits);
   unsigned long tagBits = (addr & tagMask) >> (set_bits + block_bits);
@@ -59,7 +54,6 @@ bool TLB::lookup(unsigned long addr, unsigned long &PPN){
         }
     }
 
->>>>>>> Stashed changes
   return false;
 
 }
@@ -69,8 +63,6 @@ void TLB::update(unsigned long addr, unsigned long new_PPN){
   /*TODO: Implement a TLB update here using the 
           virtual address and new PPN*/
 
-<<<<<<< Updated upstream
-=======
   unsigned long setBits = (addr & (setMask << block_bits)) >> block_bits;
   unsigned long offBits = addr & offMask;
   unsigned long tagMask = 0xFFFFFFFF << (set_bits + block_bits);
@@ -97,7 +89,6 @@ void TLB::update(unsigned long addr, unsigned long new_PPN){
   if(cache[setBits][randLine].valid)   // sI don't think we have to check this becuase we are not store the values in this to memeory
     evictions++;
   misses++;
->>>>>>> Stashed changes
   return;
 
 }
