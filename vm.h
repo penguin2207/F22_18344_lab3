@@ -23,6 +23,7 @@ private:
 
   TLB* _TLB;
   unsigned _tlb_hits;
+  unsigned _tlb_misses;
   unsigned _accesses;
   unsigned _page_faults;
   unsigned _segfaults;
@@ -41,6 +42,7 @@ public:
 
   unsigned getNumAcc() const { return _accesses; };
   unsigned getNumTlbHit() const { return _tlb_hits; };
+  unsigned getNumTlbMiss() const { return _tlb_misses; };
   unsigned getNumPgFault() const { return _page_faults; };
   unsigned getNumSegfault() const { return _segfaults; } ;
 

@@ -9,7 +9,7 @@
 #include <iostream>
 #include <limits>
 #include <stdlib.h>
-#include <string.h>
+#include <cstddef>
 #include <stdio.h>
 
 VM *vm;
@@ -95,7 +95,6 @@ void VM::vmMap(unsigned long vaddr, size_t size){
     for (int i  = 0; i < (int) levels; i++) {
       pte = pT.getEntry(curr_addr, i);
       if (i < (int)(levels-1)) {
-        printf("in if\n");
         if (!pte.pt) {
           pte.pt=pT.createEntry(curr_addr, i).pt;
         }
@@ -104,14 +103,11 @@ void VM::vmMap(unsigned long vaddr, size_t size){
         }
         pT = *pte.pt;
       } else {
-        printf("in else\n");
         
         if(!pte.pte){
-          printf("creating in else\n");
           pte.pte = pT.createEntry(curr_addr, i).pte;
         }
         if (pte.pte->ppn == (unsigned long)0x0) {
-          printf("mapping unmapped in else\n");
           pte.pte->ppn = VM_PAGEDOUT;
         }
       }
@@ -160,7 +156,7 @@ unsigned long VM::vmTranslate(unsigned long addr){
   */
 
   // Extract PPO
-  unsigned long VPO, PPN, PPO;
+  unsigned long VPO, PPN, PPO, refPPN;
   //(VPN, VPO) = (addr[63:12], addr[11:0]);
   // unsigned long VM_VPNMASK = 0xFFFFFF;
   // VPN = (addr >> 12) & VM_VPNMASK;
@@ -172,6 +168,10 @@ unsigned long VM::vmTranslate(unsigned long addr){
   PTE pte;
   unsigned long phys_addr;
   pte.pt = (pageTable *)0x0; 
+  bool tlbHit = false;
+
+  if(_TLB->lookup(addr, refPPN))
+    tlbHit = true;
   
 
   _accesses++; /*Don't forget to update the access counter*/
@@ -205,6 +205,8 @@ unsigned long VM::vmTranslate(unsigned long addr){
     return -1;
   }
   PPN = ppn_table->ppn;
+
+
   
   // Check PPN
   if (PPN == VM_PAGEDOUT) { // Last level paged out -> Page In 
@@ -223,6 +225,14 @@ unsigned long VM::vmTranslate(unsigned long addr){
   }
   // Else -- already exist
   phys_addr = (PPN << VM_PPOBITS) || PPO;
+
+  if((tlbHit) && (refPPN == phys_addr))
+    _tlb_hits++;
+  else {
+    _tlb_misses++;
+    _TLB->update(addr, phys_addr);
+  }
+
   //assert(false && "Abort: vmTranslate not implemented");
   return phys_addr;
 }

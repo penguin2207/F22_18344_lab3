@@ -1,7 +1,45 @@
 #include "tlb.h"
+#include "vm.h"
+#include <math.h>
+#include <assert.h>
+#include <iostream>
+#include <limits>
+#include <stdlib.h>
+#include <string.h>
+#include <stdio.h>
 
 TLB::TLB()
 {
+  misses = 0;
+  evictions = 0;
+  sets = TLB_SET;
+  
+  lines = TLB_LINES/TLB_SET; // associativty
+  block_size = (size_t)((TLB_CACHE_SIZE / TLB_LINES) / TLB_SET);
+  block_bits = (size_t)(log((double)(block_size))/log((double)2));// (cachesize / linesize)
+  
+
+  offMask = block_size - 1;
+  setMask = sets - 1;
+
+  cache = (block_t **)malloc((sets) *
+                                 sizeof(block_t *));
+    for (int i = 0; i < (int)sets; ++i) {
+        cache[i] =
+            (block_t *)malloc(((unsigned long long)lines) * sizeof(block_t));
+    }
+    // Initialize cache values
+    for (int i = 0; i < (int)sets; ++i) {
+        for (int j = 0; j < (int)lines; ++j) {
+            cache[i][j].valid = false;
+            cache[i][j].lru = 0;
+            cache[i][j].set_b = 0;
+            cache[i][j].off_b = 0;
+            cache[i][j].tag_b = 0;
+            cache[i][j].tag_b = 0;
+        }
+    }
+
 }
 
 bool TLB::lookup(unsigned long addr, unsigned long &PPN){
@@ -10,6 +48,18 @@ bool TLB::lookup(unsigned long addr, unsigned long &PPN){
           to the PPN cached in the TLB, and return true if
           your TLB lookup is a hit
   */
+
+  unsigned long setBits = (addr & (setMask << block_bits)) >> block_bits;
+
+
+  for (int i = 0; i < (int)lines; ++i) {
+        if (cache[setBits][i].valid &&
+            (cache[setBits][i].vpn == (addr & VM_PPNMASK))) {
+            PPN = cache[setBits][i].tag_b;
+            return true;
+        }
+    }
+
   return false;
 
 }
@@ -18,6 +68,30 @@ void TLB::update(unsigned long addr, unsigned long new_PPN){
   
   /*TODO: Implement a TLB update here using the 
           virtual address and new PPN*/
+
+  unsigned long setBits = (addr & (setMask << block_bits)) >> block_bits;
+  unsigned long offBits = addr & offMask;
+
+  unsigned long tagBits = new_PPN;
+
+  for (int i = 0; i < (int)lines; ++i) {
+        if (cache[setBits][i].valid &&
+            (cache[setBits][i].vpn == (addr & VM_PPNMASK))) {
+            cache[setBits][i].tag_b = new_PPN;
+            misses++;
+            return;
+        }
+  }
+
+  size_t randLine = rand() % lines;
+  cache[setBits][randLine].set_b = setBits;
+  cache[setBits][randLine].tag_b = tagBits;
+  cache[setBits][randLine].off_b = offBits;
+  cache[setBits][randLine].valid = true;
+  cache[setBits][randLine].vpn = (addr & VM_PPNMASK);
+  if(cache[setBits][randLine].valid)
+    evictions++;
+  misses++;
   return;
 
 }

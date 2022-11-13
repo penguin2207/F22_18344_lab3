@@ -47,11 +47,13 @@ int main(int argc, char *argv[]){
   
   unsigned accesses = vm->getNumAcc();
   unsigned TLB_hits = vm->getNumTlbHit();
+  unsigned TLB_misses = vm->getNumTlbMiss();
   unsigned page_faults = vm->getNumPgFault();
   unsigned segfaults = vm->getNumSegfault();
 
   printf("accesses = %d \n", accesses);
   printf("TLB_hits = %d \n", TLB_hits);
+  printf("TLB_misses = %d \n", TLB_misses);
   printf("Page faults = %d \n", page_faults);
   printf("Segfaults = %d \n", segfaults);
 
@@ -59,12 +61,14 @@ int main(int argc, char *argv[]){
   std::cout << "[COUT STATS:]" << std::endl;
   std::cout << "number of virtual memory accesses: " << accesses << std::endl;
   std::cout << "number of TLB hits: " << TLB_hits << std::endl;
+  std::cout << "number of TLB misses: " << TLB_misses << std::endl;
   std::cout << "number of page faults: " << page_faults << std::endl;
   std::cout << "number of segfaults: " << segfaults << std::endl;
 
   std::cerr << "[CERR STATS:]" << std::endl;
   std::cerr << "number of virtual memory accesses: " << accesses << std::endl;
   std::cerr << "number of TLB hits: " << TLB_hits << std::endl;
+  std::cout << "number of TLB misses: " << TLB_misses << std::endl;
   std::cerr << "number of page faults: " << page_faults << std::endl;
   std::cerr << "number of segfaults: " << segfaults << std::endl;
 
