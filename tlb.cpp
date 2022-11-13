@@ -1,4 +1,12 @@
 #include "tlb.h"
+#include "vm.h"
+#include <math.h>
+#include <assert.h>
+#include <iostream>
+#include <limits>
+#include <stdlib.h>
+#include <string.h>
+#include <stdio.h>
 
 TLB::TLB()   // To do: Data structure?
 {
