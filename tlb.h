@@ -9,6 +9,19 @@
 #define TLB_INDEX_LEN       4
 #define TLB_INDEX_MASK      0xF
 
+<<<<<<< Updated upstream
+=======
+typedef struct {
+    // unsigned long set_b; /* set bits */
+    unsigned long tag; /* tag bits */
+    // unsigned long off_b; /* offset bits */
+    // unsigned long vpn;
+    unsigned long ppn;
+    int lru;
+    bool valid; /* valid bit */
+} block_t;
+
+>>>>>>> Stashed changes
 class TLB
 {
 private:
