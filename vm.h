@@ -27,10 +27,6 @@ private:
   unsigned _accesses;
   unsigned _page_faults;
   unsigned _segfaults;
-<<<<<<< HEAD
-
-=======
->>>>>>> master
 
 public:
 
