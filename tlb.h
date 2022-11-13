@@ -17,10 +17,17 @@
 #define TLB_INDEX_MASK      0xF
 
 typedef struct {
+<<<<<<< HEAD
     // unsigned long set_b; /* set bits */
     unsigned long tag; /* tag bits */
     // unsigned long off_b; /* offset bits */
     unsigned long ppn;
+=======
+    unsigned long set_b; /* set bits */
+    unsigned long tag_b; /* tag bits */
+    unsigned long off_b; /* offset bits */
+    unsigned long vpn;
+>>>>>>> master
     int lru;
     bool valid; /* valid bit */
 } block_t;

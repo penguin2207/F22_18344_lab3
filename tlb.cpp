@@ -33,10 +33,17 @@ TLB::TLB()   // To do: Data structure?
         for (int j = 0; j < (int)lines; ++j) {
             cache[i][j].valid = false;
             cache[i][j].lru = 0;
+<<<<<<< HEAD
             // cache[i][j].set_b = 0;
             // cache[i][j].off_b = 0;
             cache[i][j].ppn = 0;
             cache[i][j].tag = 0;
+=======
+            cache[i][j].set_b = 0;
+            cache[i][j].off_b = 0;
+            cache[i][j].tag_b = 0;
+            cache[i][j].tag_b = 0;
+>>>>>>> master
         }
     }
 
@@ -50,14 +57,22 @@ bool TLB::lookup(unsigned long addr, unsigned long &PPN){
   */
 
   unsigned long setBits = (addr & (setMask << block_bits)) >> block_bits;
+<<<<<<< HEAD
   unsigned long tagMask = 0xFFFFFFFF << (set_bits + block_bits);
   unsigned long tagBits = (addr & tagMask) >> (set_bits + block_bits);
+=======
+>>>>>>> master
 
 
   for (int i = 0; i < (int)lines; ++i) {
         if (cache[setBits][i].valid &&
+<<<<<<< HEAD
             (cache[setBits][i].tag == tagBits)) {  // check the cache tag
             PPN = cache[setBits][i].ppn;
+=======
+            (cache[setBits][i].vpn == (addr & VM_PPNMASK))) {
+            PPN = cache[setBits][i].tag_b;
+>>>>>>> master
             return true;
         }
     }
@@ -73,6 +88,7 @@ void TLB::update(unsigned long addr, unsigned long new_PPN){
 
   unsigned long setBits = (addr & (setMask << block_bits)) >> block_bits;
   unsigned long offBits = addr & offMask;
+<<<<<<< HEAD
   unsigned long tagMask = 0xFFFFFFFF << (set_bits + block_bits);
 
   // unsigned long tagBits = new_PPN;
@@ -95,6 +111,27 @@ void TLB::update(unsigned long addr, unsigned long new_PPN){
   // cache[setBits][randLine].vpn = (addr & VM_PPNMASK);
   cache[setBits][randLine].tag = tagBits;
   if(cache[setBits][randLine].valid)   // sI don't think we have to check this becuase we are not store the values in this to memeory
+=======
+
+  unsigned long tagBits = new_PPN;
+
+  for (int i = 0; i < (int)lines; ++i) {
+        if (cache[setBits][i].valid &&
+            (cache[setBits][i].vpn == (addr & VM_PPNMASK))) {
+            cache[setBits][i].tag_b = new_PPN;
+            misses++;
+            return;
+        }
+  }
+
+  size_t randLine = rand() % lines;
+  cache[setBits][randLine].set_b = setBits;
+  cache[setBits][randLine].tag_b = tagBits;
+  cache[setBits][randLine].off_b = offBits;
+  cache[setBits][randLine].valid = true;
+  cache[setBits][randLine].vpn = (addr & VM_PPNMASK);
+  if(cache[setBits][randLine].valid)
+>>>>>>> master
     evictions++;
   misses++;
   return;

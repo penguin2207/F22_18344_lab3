@@ -9,7 +9,11 @@
 #include <iostream>
 #include <limits>
 #include <stdlib.h>
+<<<<<<< HEAD
 #include <string.h>
+=======
+#include <cstddef>
+>>>>>>> master
 #include <stdio.h>
 
 VM *vm;
@@ -57,10 +61,14 @@ void VM::vmPageFaultHandler(pageTableEntry *pte){
   }
 
   _page_faults++; /*Don't forget to update the page fault counter*/
+<<<<<<< HEAD
 
 
 
   // assert(false && "vmPageFaultHandler not implemented");
+=======
+  //assert(false && "vmPageFaultHandler not implemented");
+>>>>>>> master
 }
 
 /*
@@ -84,9 +92,46 @@ void VM::vmMap(unsigned long vaddr, size_t size){
 
   std::cerr << "[VM: Mapping Region " << std::hex << vaddr << " " << std::dec << size << "B]" << std::endl;
 
+  size_t size_count = size;
+  size_t entry_size = 1<<VM_PPOBITS;
+  size_t curr_addr = vaddr;
+  
+  pageTable pT = *(root.pt);
+  PTE pte;
+  pte.pt = (pageTable *)0x0; 
+
+  while(size_count>0){
+    //Use curr_addr to check for existing entry/create
+
+    for (int i  = 0; i < (int) levels; i++) {
+      pte = pT.getEntry(curr_addr, i);
+      if (i < (int)(levels-1)) {
+        if (!pte.pt) {
+          pte.pt=pT.createEntry(curr_addr, i).pt;
+        }
+        else if ((unsigned long)(pte.pt) == VM_PAGEDOUT) {
+          pte.pt=pT.createEntry(curr_addr, i).pt;
+        }
+        pT = *pte.pt;
+      } else {
+        
+        if(!pte.pte){
+          pte.pte = pT.createEntry(curr_addr, i).pte;
+        }
+        if (pte.pte->ppn == (unsigned long)0x0) {
+          pte.pte->ppn = VM_PAGEDOUT;
+        }
+      }
+    }
+    pT = *(root.pt);
+    size_count-=entry_size;
+    curr_addr+=entry_size;
+  }
+  
   /*TODO: Compute the number of pages in the region to be mapped
           Create an entry in the page table for each page to be mapped 
   */
+<<<<<<< HEAD
   // 9 + 9 + 9 + 9 + 12 (VPO)  // What is the case of the size greater than the page size? Are teh pages consecutive?
 
   std::cerr << "[VM: Mapping Region " << std::hex << vaddr << " " << std::dec << size << "B]" << std::endl;
@@ -131,6 +176,9 @@ void VM::vmMap(unsigned long vaddr, size_t size){
 
 
   // assert(false && "Abort: vmMap() unimplemented");
+=======
+  //assert(false && "Abort: vmMap() unimplemented");
+>>>>>>> master
 }
 
 /*
@@ -167,6 +215,12 @@ unsigned long VM::vmTranslate(unsigned long addr){
 
   // Extract PPO
   unsigned long VPO, PPN, PPO, refPPN;
+<<<<<<< HEAD
+=======
+  //(VPN, VPO) = (addr[63:12], addr[11:0]);
+  // unsigned long VM_VPNMASK = 0xFFFFFF;
+  // VPN = (addr >> 12) & VM_VPNMASK;
+>>>>>>> master
   VPO = addr & VM_PPOMASK;
   PPO = VPO; 
 
@@ -177,6 +231,7 @@ unsigned long VM::vmTranslate(unsigned long addr){
   pte.pt = (pageTable *)0x0; 
   bool tlbHit = false;
 
+<<<<<<< HEAD
   _accesses++; /*Don't forget to update the access counter*/
 
   if(_TLB->lookup(addr, refPPN)) {
@@ -186,6 +241,14 @@ unsigned long VM::vmTranslate(unsigned long addr){
   }
 
   
+=======
+  if(_TLB->lookup(addr, refPPN))
+    tlbHit = true;
+  
+
+  _accesses++; /*Don't forget to update the access counter*/
+
+>>>>>>> master
   /* We can ignore this case */
   // if (&root == NULL || root.pt == NULL) {
   //   _page_faults++;
@@ -215,6 +278,11 @@ unsigned long VM::vmTranslate(unsigned long addr){
     return -1;
   }
   PPN = ppn_table->ppn;
+<<<<<<< HEAD
+=======
+
+
+>>>>>>> master
   
   // Check PPN
   if (PPN == VM_PAGEDOUT) { // Last level paged out -> Page In 
@@ -224,7 +292,11 @@ unsigned long VM::vmTranslate(unsigned long addr){
     PPN = ppn_table->ppn;
     phys_addr = (PPN << VM_PPOBITS) || PPO;
     addToReplacementList(addr);
+<<<<<<< HEAD
     // return phys_addr;
+=======
+    return phys_addr;
+>>>>>>> master
   }
   else if (PPN == (unsigned long)0x0) {  // Unmapped 
     /* In real life we call segfault */
@@ -234,6 +306,7 @@ unsigned long VM::vmTranslate(unsigned long addr){
   // Else -- already exist
   phys_addr = (PPN << VM_PPOBITS) || PPO;
 
+<<<<<<< HEAD
   // if((tlbHit) && (refPPN == phys_addr))
   //   _tlb_hits++;
   // else {
@@ -243,6 +316,14 @@ unsigned long VM::vmTranslate(unsigned long addr){
   
   _tlb_misses++;
   _TLB->update(addr, phys_addr);
+=======
+  if((tlbHit) && (refPPN == phys_addr))
+    _tlb_hits++;
+  else {
+    _tlb_misses++;
+    _TLB->update(addr, phys_addr);
+  }
+>>>>>>> master
 
   //assert(false && "Abort: vmTranslate not implemented");
   return phys_addr;
