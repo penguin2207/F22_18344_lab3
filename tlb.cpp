@@ -14,12 +14,13 @@ TLB::TLB()
   evictions = 0;
   sets = TLB_SET;
   
-  lines = TLB_LINES/TLB_SET; // associativty
-  block_size = (size_t)((TLB_CACHE_SIZE / TLB_LINES) / TLB_SET);
-  block_bits = (size_t)(log((double)(block_size))/log((double)2));// (cachesize / linesize)
+  // lines = TLB_LINES/TLB_SET; // associativty
+  lines = (size_t)((TLB_CACHE_SIZE / TLB_BLOCKSIZE) / TLB_SET);
+  // block_size = (size_t)((TLB_CACHE_SIZE / TLB_LINES) / TLB_SET);
+  block_bits = TLB_BLOCKBITS;
   
 
-  offMask = block_size - 1;
+  offMask = TLB_BLOCKSIZE - 1;
   setMask = sets - 1;
 
   cache = (block_t **)malloc((sets) *
@@ -32,7 +33,7 @@ TLB::TLB()
     for (int i = 0; i < (int)sets; ++i) {
         for (int j = 0; j < (int)lines; ++j) {
             cache[i][j].valid = false;
-            cache[i][j].lru = 0;
+            // cache[i][j].lru = 0;
             // cache[i][j].set_b = 0;
             // cache[i][j].off_b = 0;
             cache[i][j].ppn = 0;
@@ -48,10 +49,8 @@ bool TLB::lookup(unsigned long addr, unsigned long &PPN){
           to the PPN cached in the TLB, and return true if
           your TLB lookup is a hit
   */
-
   unsigned long setBits = (addr & (setMask << block_bits)) >> block_bits;
-  unsigned long tagMask = 0xFFFFFFFF << (set_bits + block_bits);
-  unsigned long tagBits = (addr & tagMask) >> (set_bits + block_bits);
+  unsigned long tagBits = (addr & VM_PPNMASK) >> 12;
 
   for (int i = 0; i < (int)lines; ++i) {
         if (cache[setBits][i].valid &&
@@ -70,12 +69,9 @@ void TLB::update(unsigned long addr, unsigned long new_PPN){
   /*TODO: Implement a TLB update here using the 
           virtual address and new PPN*/
 
-   unsigned long setBits = (addr & (setMask << block_bits)) >> block_bits;
-  unsigned long offBits = addr & offMask;
-  unsigned long tagMask = 0xFFFFFFFF << (set_bits + block_bits);
-
-  // unsigned long tagBits = new_PPN;
-  unsigned long tagBits = (addr & tagMask) >> (set_bits + block_bits);
+  unsigned long setBits = (addr & (setMask << block_bits)) >> block_bits;
+  // unsigned long offBits = addr & offMask;
+  unsigned long tagBits = (addr & VM_PPNMASK) >> 12;
 
   // for (int i = 0; i < (int)lines; ++i) {
   //       if (cache[setBits][i].valid &&

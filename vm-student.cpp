@@ -208,8 +208,6 @@ unsigned long VM::vmTranslate(unsigned long addr){
     return -1;
   }
   PPN = ppn_table->ppn;
-
-
   
   // Check PPN
   if (PPN == VM_PAGEDOUT) { // Last level paged out -> Page In 
