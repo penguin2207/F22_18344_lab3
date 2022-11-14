@@ -49,8 +49,9 @@ bool TLB::lookup(unsigned long addr, unsigned long &PPN){
           to the PPN cached in the TLB, and return true if
           your TLB lookup is a hit
   */
-  unsigned long setBits = (addr & (setMask << block_bits)) >> block_bits;
+  // unsigned long setBits = (addr & (setMask << block_bits)) >> block_bits;
   unsigned long tagBits = (addr & VM_PPNMASK) >> 12;
+  unsigned int setBits = ((addr >> VM_PPOBITS) & setMask);
 
   for (int i = 0; i < (int)lines; ++i) {
         if (cache[setBits][i].valid &&
@@ -69,7 +70,8 @@ void TLB::update(unsigned long addr, unsigned long new_PPN){
   /*TODO: Implement a TLB update here using the 
           virtual address and new PPN*/
 
-  unsigned long setBits = (addr & (setMask << block_bits)) >> block_bits;
+  // unsigned long setBits = (addr & (setMask << block_bits)) >> block_bits;
+  unsigned int setBits = ((addr >> VM_PPOBITS) & setMask);
   // unsigned long offBits = addr & offMask;
   unsigned long tagBits = (addr & VM_PPNMASK) >> 12;
 

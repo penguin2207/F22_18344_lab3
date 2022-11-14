@@ -44,6 +44,16 @@ int main(int argc, char *argv[]){
   //   vm->pageStoreSingle((unsigned long)p+i,0xfeefee);
   // }
 
+  // p = (void*)0x18000; 
+  // vm->vmMap((unsigned long)p,65536);
+  // for(int i = 0; i < 65536; i+=1024){
+  //   vm->pageStoreSingle((unsigned long)p+i,0xfeefee);
+  // }
+
+
+
+  
+
   
   unsigned accesses = vm->getNumAcc();
   unsigned TLB_hits = vm->getNumTlbHit();
