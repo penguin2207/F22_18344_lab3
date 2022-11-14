@@ -14,12 +14,13 @@ TLB::TLB()
   evictions = 0;
   sets = TLB_SET;
   
-  lines = TLB_LINES/TLB_SET; // associativty
-  block_size = (size_t)((TLB_CACHE_SIZE / TLB_LINES) / TLB_SET);
-  block_bits = (size_t)(log((double)(block_size))/log((double)2));// (cachesize / linesize)
+  // lines = TLB_LINES/TLB_SET; // associativty
+  lines = (size_t)((TLB_CACHE_SIZE / TLB_BLOCKSIZE) / TLB_SET);
+  // block_size = (size_t)((TLB_CACHE_SIZE / TLB_LINES) / TLB_SET);
+  block_bits = TLB_BLOCKBITS;
   
 
-  offMask = block_size - 1;
+  offMask = TLB_BLOCKSIZE - 1;
   setMask = sets - 1;
 
   cache = (block_t **)malloc((sets) *
@@ -32,11 +33,11 @@ TLB::TLB()
     for (int i = 0; i < (int)sets; ++i) {
         for (int j = 0; j < (int)lines; ++j) {
             cache[i][j].valid = false;
-            cache[i][j].lru = 0;
-            cache[i][j].set_b = 0;
-            cache[i][j].off_b = 0;
-            cache[i][j].tag_b = 0;
-            cache[i][j].tag_b = 0;
+            // cache[i][j].lru = 0;
+            // cache[i][j].set_b = 0;
+            // cache[i][j].off_b = 0;
+            cache[i][j].ppn = 0;
+            cache[i][j].tag = 0;
         }
     }
 
@@ -48,17 +49,16 @@ bool TLB::lookup(unsigned long addr, unsigned long &PPN){
           to the PPN cached in the TLB, and return true if
           your TLB lookup is a hit
   */
-
   unsigned long setBits = (addr & (setMask << block_bits)) >> block_bits;
-
+  unsigned long tagBits = (addr & VM_PPNMASK) >> 12;
 
   for (int i = 0; i < (int)lines; ++i) {
         if (cache[setBits][i].valid &&
-            (cache[setBits][i].vpn == (addr & VM_PPNMASK))) {
-            PPN = cache[setBits][i].tag_b;
+            (cache[setBits][i].tag == tagBits)) {  // check the cache tag
+            PPN = cache[setBits][i].ppn;
             return true;
         }
-    }
+  }
 
   return false;
 
@@ -70,26 +70,26 @@ void TLB::update(unsigned long addr, unsigned long new_PPN){
           virtual address and new PPN*/
 
   unsigned long setBits = (addr & (setMask << block_bits)) >> block_bits;
-  unsigned long offBits = addr & offMask;
+  // unsigned long offBits = addr & offMask;
+  unsigned long tagBits = (addr & VM_PPNMASK) >> 12;
 
-  unsigned long tagBits = new_PPN;
-
-  for (int i = 0; i < (int)lines; ++i) {
-        if (cache[setBits][i].valid &&
-            (cache[setBits][i].vpn == (addr & VM_PPNMASK))) {
-            cache[setBits][i].tag_b = new_PPN;
-            misses++;
-            return;
-        }
-  }
+  // for (int i = 0; i < (int)lines; ++i) {
+  //       if (cache[setBits][i].valid &&
+  //           (cache[setBits][i].vpn == (addr & VM_PPNMASK))) {
+  //           cache[setBits][i].tag_b = new_PPN;
+  //           misses++;
+  //           return;
+  //       }
+  // }
 
   size_t randLine = rand() % lines;
-  cache[setBits][randLine].set_b = setBits;
-  cache[setBits][randLine].tag_b = tagBits;
-  cache[setBits][randLine].off_b = offBits;
-  cache[setBits][randLine].valid = true;
-  cache[setBits][randLine].vpn = (addr & VM_PPNMASK);
-  if(cache[setBits][randLine].valid)
+  // cache[setBits][randLine].set_b = setBits;
+  cache[setBits][randLine].ppn = new_PPN;
+  // cache[setBits][randLine].off_b = offBits;
+  cache[setBits][randLine].valid = true; 
+  // cache[setBits][randLine].vpn = (addr & VM_PPNMASK);
+  cache[setBits][randLine].tag = tagBits;
+  if(cache[setBits][randLine].valid)   // sI don't think we have to check this becuase we are not store the values in this to memeory
     evictions++;
   misses++;
   return;

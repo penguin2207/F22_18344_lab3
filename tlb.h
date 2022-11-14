@@ -9,7 +9,8 @@
  * parameters
 */
 #define TLB_CACHE_SIZE      1024
-#define TLB_LINES           32
+#define TLB_BLOCKSIZE       16
+#define TLB_BLOCKBITS       4
 
 #define TLB_SET             16
 #define TLB_OFFSET_LEN      12
@@ -17,11 +18,11 @@
 #define TLB_INDEX_MASK      0xF
 
 typedef struct {
-    unsigned long set_b; /* set bits */
-    unsigned long tag_b; /* tag bits */
-    unsigned long off_b; /* offset bits */
-    unsigned long vpn;
-    int lru;
+    // unsigned long set_b; /* set bits */
+    unsigned long tag; /* tag bits */
+    // unsigned long off_b; /* offset bits */
+    unsigned long ppn;
+    // int lru;
     bool valid; /* valid bit */
 } block_t;
 
@@ -29,9 +30,6 @@ class TLB
 {
 private:
   size_t tlbSize;
-
-  
-  
 
   size_t block_size;
   size_t sets;
