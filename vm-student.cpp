@@ -109,12 +109,12 @@ void VM::vmMap(unsigned long vaddr, size_t size){
         if(!pte.pte){
           pte.pte = pT.createEntry(curr_addr, i).pte;
           _createPPN++;
-
         }
         if (pte.pte->ppn == (unsigned long)0x0) {  // In the unmapped case <not happening in our simulation>
           pte.pte->ppn = VM_PAGEDOUT;
         }
       }
+      
     }
     pT = *(root.pt);
     size_count-=entry_size;
