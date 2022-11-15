@@ -48,27 +48,51 @@ int main(int argc, char *argv[]){
 
 
   /* Test case 2: Pagefault consistencies */
-  // p = (void*)0x18000; 
-  // vm->vmMap((unsigned long)p,65536);
-  // for(int i = 0; i < 65536; i+=1024){
-  //   vm->pageStoreSingle((unsigned long)p+i,0xfeefee);
-  // }
+  p = (void*)0x18000; 
+  vm->vmMap((unsigned long)p,65536);
+  for(int i = 0; i < 65536; i+=1024){
+    vm->pageStoreSingle((unsigned long)p+i,0xfeefee);
+  }
 
-  p = (void*)0x20000;
-  vm->vmMap((unsigned long)p,4097);
-  vm->pageStoreMulti((unsigned long)p, 4096,0xfeefee);
+
+  // p = (void*)0x20000;
+  // vm->vmMap((unsigned long)p,4097);
+  //
+  //vm->pageStoreMulti((unsigned long)p, 4096,0xfeefee);
 
   // vm->pageStoreMulti((unsigned long)p, 4096,0xfeefee);  // No segfaults, 1 page fault (1 miss)
   // // vm->pageStoreMulti((unsigned long)p, 4097,0xfeefee);    // One segfault, 1 page fault (1 miss)
   // // vm->pageStoreMulti((unsigned long)p+4096, 2,0xfeefee);  // 2 segfaults
 
-
   // vm->pageStoreMulti((unsigned long)p+4095, 2, 0xfeefee);  // no segfault, one pagefault (1 miss) - overflowing to entries
   // vm->pageStoreSingle((unsigned long)p+4097, 0xfeefee);   // hit
 
-  p = (void *)0x1FF000;     // last entry
-  // vm->vmMap((unsigned long)p, 8192);
-  // vm->pageStoreMulti((unsigned long)p+4095, 4, 0xfeefee);   // 2 miss (2 page fault), 1 hit
+
+  /* Test case 3: Overflowing last level page */
+  // p = (void *)0x1FF000;                                     // last index entry of the last level
+  // vm->vmMap((unsigned long)p, 8192);                        // Map 8192 (This will create 2 PNN entries, but at different tables)
+  // // vm->pageStoreMulti((unsigned long)p, 4096, 0xfeefee);   // 1 miss (1 page fault), 4095 hits, 4 accesses
+  // vm->pageStoreMulti((unsigned long)p, 4097, 0xfeefee);     // 2 misses (2 page fault), 4095 hits, 8 accesses
+
+  /* Test case 4: Mapping 0*/
+  // p = (void*)0x22000;
+  // vm->vmMap((unsigned long)p,0);
+  // vm->pageStoreMulti((unsigned long)p, 5, 0xfeefee);            // 5 segfaults
+
+  /* Test case 5: Locality */
+  // p = (void*)0x22000;
+  // vm->vmMap((unsigned long)p,);
+  // for 
+  // vm->pageStoreMulti((unsigned long)p, 5, 0xfeefee);            // 5 segfaults
+
+
+  
+
+
+
+
+
+
 
 
   unsigned accesses = vm->getNumAcc();

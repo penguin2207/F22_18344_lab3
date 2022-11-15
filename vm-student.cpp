@@ -108,7 +108,6 @@ void VM::vmMap(unsigned long vaddr, size_t size){
         
         if(!pte.pte){
           pte.pte = pT.createEntry(curr_addr, i).pte;
-          printf("created PPN entry\n");
           _createPPN++;
 
         }
@@ -261,7 +260,7 @@ void VM::Load(unsigned long addr){
 void VM::Store(unsigned long addr){
 
   unsigned long translatedPaddr = vmTranslate(addr);
-  std::cerr << "Store[0x" << std::hex << addr << 
-                    "] => [" << translatedPaddr << "]" << std::endl;
+  // std::cerr << "Store[0x" << std::hex << addr << 
+  //                   "] => [" << translatedPaddr << "]" << std::endl;
 
 }
