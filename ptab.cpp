@@ -61,6 +61,7 @@ PTE pageTable::getEntry(unsigned long addr, size_t level){
   */
 
   unsigned long pt_idx = getEntryIdFromAddr(addr, level+1);
+  printf("idx at level %d is %d \n", (int)level+1, (int)pt_idx);
 
   return this->table[pt_idx];
 
@@ -84,10 +85,10 @@ unsigned pageTable::getEntryIdFromAddr(unsigned long addr, size_t level){
   size_t level_shift = VM_PTABLEVS-level;
   unsigned long level_mask = 0x1FF;
   unsigned long pte_idx = (addr >> ((VM_PTABBITS*level_shift) + VM_PPOBITS)) & level_mask;
+  
 
   assert( (addr & level_mask) <= pageTableSize );
-
-
+  
   return pte_idx; 
 
 }
