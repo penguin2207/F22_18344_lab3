@@ -88,8 +88,9 @@ void VM::vmMap(unsigned long vaddr, size_t size){
   pageTable pT = *(root.pt);
   PTE pte;
   pte.pt = (pageTable *)0x0; 
-  int _createTable = 0;
   int _createPPN = 0;
+
+  printf("Begin mapping %d bytes starting at vaddr: 0x%x\n", (int)size, (int)vaddr);
 
   while(size_count>0){
     //Use curr_addr to check for existing entry/create
@@ -104,6 +105,7 @@ void VM::vmMap(unsigned long vaddr, size_t size){
           pte.pt=pT.createEntry(curr_addr, i).pt;
         }
         pT = *pte.pt;
+        printf("pT address starts at %p for level %d\n", (void *)(pte.pt), i+2);
       } else {
         
         if(!pte.pte){
@@ -114,13 +116,13 @@ void VM::vmMap(unsigned long vaddr, size_t size){
           pte.pte->ppn = VM_PAGEDOUT;
         }
       }
-      
+         
     }
     pT = *(root.pt);
     size_count-=entry_size;
     curr_addr+=entry_size;
+    printf("%d bytes left to be mapped \n", size_count);
   }
-  printf("Create Table: %d\n", _createTable);
   printf("Create PPN: %d\n", _createPPN);
   
   /*TODO: Compute the number of pages in the region to be mapped
