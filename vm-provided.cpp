@@ -34,7 +34,11 @@ void VM::pageLoadMulti(unsigned long addr, uint32_t size, uint32_t instId){
 }
 
 void VM::pageStoreMulti(unsigned long addr, uint32_t size, uint32_t instId){
-  vm->Store(addr);
+  for (uint32_t i = 0; i < size; i++){
+    vm->Store(addr);
+    addr++;
+  }
+  
 }
 
 void VM::pageLoadSingle(unsigned long addr, uint32_t instId){

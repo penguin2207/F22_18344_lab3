@@ -81,17 +81,19 @@ void VM::vmMap(unsigned long vaddr, size_t size){
 
   std::cerr << "[VM: Mapping Region " << std::hex << vaddr << " " << std::dec << size << "B]" << std::endl;
 
-  size_t size_count = size;
+  int32_t size_count = size;
   size_t entry_size = 1<<VM_PPOBITS;
   size_t curr_addr = vaddr;
   
   pageTable pT = *(root.pt);
   PTE pte;
   pte.pt = (pageTable *)0x0; 
+  int _createTable = 0;
+  int _createPPN = 0;
 
   while(size_count>0){
     //Use curr_addr to check for existing entry/create
-
+    
     for (int i  = 0; i < (int) levels; i++) {
       pte = pT.getEntry(curr_addr, i);
       if (i < (int)(levels-1)) {
@@ -106,8 +108,11 @@ void VM::vmMap(unsigned long vaddr, size_t size){
         
         if(!pte.pte){
           pte.pte = pT.createEntry(curr_addr, i).pte;
+          printf("created PPN entry\n");
+          _createPPN++;
+
         }
-        if (pte.pte->ppn == (unsigned long)0x0) {
+        if (pte.pte->ppn == (unsigned long)0x0) {  // In the unmapped case <not happening in our simulation>
           pte.pte->ppn = VM_PAGEDOUT;
         }
       }
@@ -116,6 +121,8 @@ void VM::vmMap(unsigned long vaddr, size_t size){
     size_count-=entry_size;
     curr_addr+=entry_size;
   }
+  printf("Create Table: %d\n", _createTable);
+  printf("Create PPN: %d\n", _createPPN);
   
   /*TODO: Compute the number of pages in the region to be mapped
           Create an entry in the page table for each page to be mapped 
@@ -170,7 +177,7 @@ unsigned long VM::vmTranslate(unsigned long addr){
   pte.pt = (pageTable *)0x0; 
   // bool tlbHit = false;
 
-   _accesses++; /*Don't forget to update the access counter*/
+   
 
   if(_TLB->lookup(addr, refPPN)) {
     // tlbHit = true;
@@ -178,13 +185,14 @@ unsigned long VM::vmTranslate(unsigned long addr){
     return refPPN;
   }
 
-
+  
   /* We can ignore this case */
   // if (&root == NULL || root.pt == NULL) {
   //   _page_faults++;
   // }
 
   for (unsigned int i  = 0; i < levels; i++) {  // Traversing up to level 3
+  _accesses++; /*Don't forget to update the access counter*/
     pte = pt.getEntry(addr, i); // Level in our function is 1-4
     if (i != levels - 1) {
       if (pte.pt == NULL) {
@@ -192,7 +200,7 @@ unsigned long VM::vmTranslate(unsigned long addr){
         return -1;
       }
       else if ((unsigned long)(pte.pt) == VM_PAGEDOUT) {
-        /* This case would not happen in the simulation*/
+        /* This case would not happen in the simulation */
         _page_faults++;
         return -1;
       }
@@ -219,7 +227,7 @@ unsigned long VM::vmTranslate(unsigned long addr){
     addToReplacementList(addr);
 
   }
-  else if (PPN == (unsigned long)0x0) {  // Unmapped 
+  else if (PPN == (unsigned long)0x0) {  // Unmapped <not happening in our simulation>
     /* In real life we call segfault */
     _segfaults++;
     return -1;

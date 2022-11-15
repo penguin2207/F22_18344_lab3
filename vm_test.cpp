@@ -9,7 +9,9 @@ int main(int argc, char *argv[]){
   vm = new VM();
  
   void *p = (void*)0x0; 
-  vm->vmMap((unsigned long)p,8192);
+  // vm->vmMap((unsigned long)p,8192);
+
+  /* Test case 1: Pagefault and Segfault */
   
   // std::cerr << "[TEST1: OK; page fault]" << std::endl;
   // vm->pageStoreSingle((unsigned long)p+0,0xfeefee);
@@ -44,11 +46,29 @@ int main(int argc, char *argv[]){
   //   vm->pageStoreSingle((unsigned long)p+i,0xfeefee);
   // }
 
-  p = (void*)0x18000; 
-  vm->vmMap((unsigned long)p,65536);
-  for(int i = 0; i < 65536; i+=1024){
-    vm->pageStoreSingle((unsigned long)p+i,0xfeefee);
-  }
+
+  /* Test case 2: Pagefault consistencies */
+  // p = (void*)0x18000; 
+  // vm->vmMap((unsigned long)p,65536);
+  // for(int i = 0; i < 65536; i+=1024){
+  //   vm->pageStoreSingle((unsigned long)p+i,0xfeefee);
+  // }
+
+  p = (void*)0x20000;
+  vm->vmMap((unsigned long)p,4097);
+  vm->pageStoreMulti((unsigned long)p, 4096,0xfeefee);
+
+  // vm->pageStoreMulti((unsigned long)p, 4096,0xfeefee);  // No segfaults, 1 page fault (1 miss)
+  // // vm->pageStoreMulti((unsigned long)p, 4097,0xfeefee);    // One segfault, 1 page fault (1 miss)
+  // // vm->pageStoreMulti((unsigned long)p+4096, 2,0xfeefee);  // 2 segfaults
+
+
+  // vm->pageStoreMulti((unsigned long)p+4095, 2, 0xfeefee);  // no segfault, one pagefault (1 miss) - overflowing to entries
+  // vm->pageStoreSingle((unsigned long)p+4097, 0xfeefee);   // hit
+
+  p = (void *)0x1FF000;     // last entry
+  // vm->vmMap((unsigned long)p, 8192);
+  // vm->pageStoreMulti((unsigned long)p+4095, 4, 0xfeefee);   // 2 miss (2 page fault), 1 hit
 
 
   unsigned accesses = vm->getNumAcc();

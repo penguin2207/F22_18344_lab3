@@ -33,6 +33,7 @@ PTE pageTable::createEntry(unsigned long addr, size_t level){
 
   if (level < VM_PTABLEVS-1) {
     pte.pt = new pageTable();
+
   }
   else {
     pte.pte = new pageTableEntry(VM_PAGEDOUT); 
