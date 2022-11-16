@@ -45,9 +45,14 @@ void VM::vmPageFaultHandler(pageTableEntry *pte){
 
   /* Case1 : Must replace page*/
   if (phys_addr == 0x0)  {
-    replacePage();
-    std::pair<unsigned long, unsigned long> replace = replacePage();
-    ppn = replace.second;
+
+    ppn = 0xdeadbeef;
+    while (ppn == 0xdeadbeef) {
+      std::pair<unsigned long, unsigned long> replace = replacePage();
+      ppn = replace.second;
+    }
+
+    //printf("this is ppn %x\n", ppn);
     pte->ppn = ppn; // Update the PTE 
   }
 
@@ -105,7 +110,7 @@ void VM::vmMap(unsigned long vaddr, size_t size){
           pte.pt=pT.createEntry(curr_addr, i).pt;
         }
         pT = *pte.pt;
-        printf("pT address starts at %p for level %d\n", (void *)(pte.pt), i+2);
+        // printf("pT address starts at %p for level %d\n", (void *)(pte.pt), i+2);
       } else {
         
         if(!pte.pte){
@@ -121,9 +126,9 @@ void VM::vmMap(unsigned long vaddr, size_t size){
     pT = *(root.pt);
     size_count-=entry_size;
     curr_addr+=entry_size;
-    printf("%d bytes left to be mapped \n", size_count);
+    // printf("%d bytes left to be mapped \n", size_count);
   }
-  printf("Create PPN: %d\n", _createPPN);
+  // printf("Create PPN: %d\n", _createPPN);
   
   /*TODO: Compute the number of pages in the region to be mapped
           Create an entry in the page table for each page to be mapped 
