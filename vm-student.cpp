@@ -45,9 +45,12 @@ void VM::vmPageFaultHandler(pageTableEntry *pte){
 
   /* Case1 : Must replace page*/
   if (phys_addr == 0x0)  {
-    replacePage();
-    std::pair<unsigned long, unsigned long> replace = replacePage();
-    ppn = replace.second;
+    ppn = 0xdeadbeef;
+    while (ppn == 0xdeadbeef) {
+      std::pair<unsigned long, unsigned long> replace = replacePage();
+      ppn = replace.second;
+    }
+    //printf("this is ppn %x\n", ppn);
     pte->ppn = ppn; // Update the PTE 
   }
 
@@ -210,7 +213,6 @@ unsigned long VM::vmTranslate(unsigned long addr){
     PPN = ppn_table->ppn;
     phys_addr = (PPN << VM_PPOBITS) || PPO;
     addToReplacementList(addr);
-
   }
   else if (PPN == (unsigned long)0x0) {  // Unmapped 
     /* In real life we call segfault */

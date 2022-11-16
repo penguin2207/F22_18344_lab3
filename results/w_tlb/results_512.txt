@@ -1,42 +1,42 @@
-Test 1, TLB 
+Test 1 
 accesses = 12
 TLB_hits = 6
 TLB_misses = 2
 Page faults = 2
 Segfaults = 1
-Test 2, TLB 
+Test 2 
 accesses = 64
 TLB_hits = 48
 TLB_misses = 16
 Page faults = 16
 Segfaults = 0
-Test 3, TLB 
-accesses = 64
-TLB_hits = 112
-TLB_misses = 16
-Page faults = 16
-Segfaults = 0
-Test 4, TLB 
+Test 4 
 accesses = 8
 TLB_hits = 8191
 TLB_misses = 2
 Page faults = 2
 Segfaults = 0
-Test 5, TLB 
-accesses = 2048
-TLB_hits = 2096640
-TLB_misses = 512
-Page faults = 512
-Segfaults = 0
-Test 6, TLB 
+Test 4 
 accesses = 5
 TLB_hits = 0
 TLB_misses = 0
 Page faults = 0
 Segfaults = 5
-Test 7, TLB 
-accesses = 6299644
-TLB_hits = 2145904641
-TLB_misses = 1572863
-Page faults = 1572863
-Segfaults = 2048
+Test 5 
+accesses = 2048
+TLB_hits = 2096640
+TLB_misses = 512
+Page faults = 512
+Segfaults = 0
+Test 6 
+accesses = 2400
+TLB_hits = 2096710
+TLB_misses = 600
+Page faults = 584
+Segfaults = 0
+Test 8 
+accesses = 1553700
+TLB_hits = 4205879
+TLB_misses = 388425
+Page faults = 386513
+Segfaults = 0
