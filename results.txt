@@ -1,0 +1,18 @@
+Test 1, TLB 
+accesses = 76
+TLB_hits = 54
+TLB_misses = 18
+Page faults = 18
+Segfaults = 1
+Test 2
+accesses = 64
+TLB_hits = 48
+TLB_misses = 16
+Page faults = 16
+Segfaults = 0
+Test 3
+accesses = 64
+TLB_hits = 112
+TLB_misses = 16
+Page faults = 16
+Segfaults = 0

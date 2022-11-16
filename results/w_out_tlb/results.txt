@@ -1,0 +1,36 @@
+Test 1, TLB 
+accesses = 36
+TLB_hits = 0
+TLB_misses = 0
+Page faults = 2
+Segfaults = 1
+Test 2, TLB 
+accesses = 256
+TLB_hits = 0
+TLB_misses = 0
+Page faults = 16
+Segfaults = 0
+Test 3, TLB 
+accesses = 512
+TLB_hits = 0
+TLB_misses = 0
+Page faults = 24
+Segfaults = 0
+Test 4, TLB 
+accesses = 32772
+TLB_hits = 0
+TLB_misses = 0
+Page faults = 2
+Segfaults = 0
+Test 5, TLB 
+accesses = 8388608
+TLB_hits = 0
+TLB_misses = 0
+Page faults = 1986587
+Segfaults = 0
+Test 6, TLB 
+accesses = 5
+TLB_hits = 0
+TLB_misses = 0
+Page faults = 0
+Segfaults = 5

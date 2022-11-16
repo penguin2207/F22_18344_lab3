@@ -61,6 +61,8 @@ PTE pageTable::getEntry(unsigned long addr, size_t level){
 
   unsigned long pt_idx = getEntryIdFromAddr(addr, level+1);
 
+  //printf("idx at level %d is %d \n", (int)level+1, (int)pt_idx);
+
   return this->table[pt_idx];
 
 }
@@ -75,7 +77,7 @@ unsigned pageTable::getEntryIdFromAddr(unsigned long addr, size_t level){
           bits from the address to extract and return.  This bit field from
           the address is the index into that level of page table
 
-          A good chec to be sure that you've extracted the bits correctly
+          A good check to be sure that you've extracted the bits correctly
           is to have something like the following assertion in your code...
           assert( (addr & mask) <= pageTableSize );
   */
