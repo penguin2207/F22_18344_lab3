@@ -122,7 +122,7 @@ void testCase3(){
   unsigned segfaults1 = vm2->getNumSegfault();
 
 
-  results << "Test 4 \n";
+  results << "Test 3 \n";
   results << "accesses = " << accesses1 << "\n";
   results << "TLB_hits = " << TLB_hits1 << "\n";
   results << "TLB_misses = " << TLB_misses1 << "\n";
@@ -400,7 +400,7 @@ void testCase7(){
   unsigned page_faults1 = vm2->getNumPgFault();
   unsigned segfaults1 = vm2->getNumSegfault();
 
-  results << "Test 8 \n";
+  results << "Test 7 \n";
   results << "accesses = " << accesses1 << "\n";
   results << "TLB_hits = " << TLB_hits1 << "\n";
   results << "TLB_misses = " << TLB_misses1 << "\n";

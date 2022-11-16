@@ -10,7 +10,7 @@ TLB_hits = 48
 TLB_misses = 16
 Page faults = 16
 Segfaults = 0
-Test 4 
+Test 3
 accesses = 8
 TLB_hits = 8191
 TLB_misses = 2
@@ -34,7 +34,7 @@ TLB_hits = 2096748
 TLB_misses = 562
 Page faults = 559
 Segfaults = 0
-Test 8 
+Test 7
 accesses = 1504432
 TLB_hits = 4218196
 TLB_misses = 376108
