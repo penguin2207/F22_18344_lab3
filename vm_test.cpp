@@ -50,8 +50,8 @@ int main(int argc, char *argv[]){
   // }
 
 
-  p = (void*)0x20000;
-  vm->vmMap((unsigned long)p,4097);
+  // p = (void*)0x20000;
+  // vm->vmMap((unsigned long)p,4097);
 
   //vm->pageStoreMulti((unsigned long)p, 4096,0xfeefee);
 
@@ -66,8 +66,9 @@ int main(int argc, char *argv[]){
   /* Test case 3: Overflowing last level page */
   // p = (void *)0x1FF000;                                     // last index entry of the last level
   // vm->vmMap((unsigned long)p, 8192);                        // Map 8192 (This will create 2 PNN entries, but at different tables)
-  // vm->pageStoreMulti((unsigned long)p, 4096, 0xfeefee);     // 1 miss (1 page fault), 4095 hits, 4 accesses
-  // vm->pageStoreMulti((unsigned long)p, 4097, 0xfeefee);     // 2 misses (2 page fault), 4095 hits, 8 accesses
+  // vm->pageStoreMulti((unsigned long)p, 4096, 0xfeefee);   // 2 misses (2 page fault), 4095 hits, 8 accesses
+  // vm->pageStoreMulti((unsigned long)p, 4096, 0xfeefee);      // 2 misses (2 page fault), 4095 hits, 8 accesses
+  // vm->pageStoreMulti((unsigned long)p, 4096, 0xfeefee);        
 
   /* Test case 4: Mapping 0 */
   // p = (void*)0x22000;
@@ -80,6 +81,49 @@ int main(int argc, char *argv[]){
   for (int i = 0; i < 2097152; i++){
       vm->pageStoreSingle((unsigned long)p+i,0xfeefee);     // miss occur at every first access of the entries -> total of 512 misses
   }
+  vm->pageStoreSingle((unsigned long)p,0xfeefee);
+  vm->pageStoreSingle((unsigned long)p+15000,0xfeefee);
+  vm->pageStoreSingle((unsigned long)p+5087,0xfeefee);
+  vm->pageStoreSingle((unsigned long)p+455087,0xfeefee);
+  vm->pageStoreSingle((unsigned long)p+635087,0xfeefee);
+  vm->pageStoreSingle((unsigned long)p+1493473,0xfeefee);
+  vm->pageStoreSingle((unsigned long)p+153473,0xfeefee);
+  vm->pageStoreSingle((unsigned long)p+123473,0xfeefee);
+  vm->pageStoreSingle((unsigned long)p+173473,0xfeefee);
+  vm->pageStoreSingle((unsigned long)p+193473,0xfeefee);
+  vm->pageStoreSingle((unsigned long)p+153473,0xfeefee);
+  vm->pageStoreSingle((unsigned long)p+123473,0xfeefee);
+
+  vm->pageStoreSingle((unsigned long)p+13873,0xfeefee);
+  vm->pageStoreSingle((unsigned long)p+3873,0xfeefee);
+  vm->pageStoreSingle((unsigned long)p+563872,0xfeefee);
+  vm->pageStoreSingle((unsigned long)p+434872,0xfeefee);
+  vm->pageStoreSingle((unsigned long)p+1434872,0xfeefee);
+  vm->pageStoreSingle((unsigned long)p+1230000,0xfeefee);
+  vm->pageStoreSingle((unsigned long)p+1234872,0xfeefee);
+  vm->pageStoreSingle((unsigned long)p+1485000,0xfeefee);
+  vm->pageStoreSingle((unsigned long)p+80000,0xfeefee);
+  vm->pageStoreSingle((unsigned long)p+17000,0xfeefee);
+  vm->pageStoreSingle((unsigned long)p+25000,0xfeefee);
+  vm->pageStoreSingle((unsigned long)p+250000,0xfeefee);
+  vm->pageStoreSingle((unsigned long)p+1687552,0xfeefee); 
+  vm->pageStoreSingle((unsigned long)p+1974272,0xfeefee); 
+  vm->pageStoreSingle((unsigned long)p+1925120,0xfeefee); 
+  vm->pageStoreSingle((unsigned long)p+1892352,0xfeefee);
+  vm->pageStoreSingle((unsigned long)p+173473,0xfeefee);
+  vm->pageStoreSingle((unsigned long)p+193473,0xfeefee);
+  vm->pageStoreSingle((unsigned long)p+900000,0xfeefee);
+  vm->pageStoreSingle((unsigned long)p+800000,0xfeefee);
+
+ 
+  vm->pageStoreSingle((unsigned long)p+2084864,0xfeefee); 
+  vm->pageStoreSingle((unsigned long)p+2048000,0xfeefee); 
+  vm->pageStoreSingle((unsigned long)p+2056192,0xfeefee); 
+  vm->pageStoreSingle((unsigned long)p+2093056,0xfeefee); 
+  vm->pageStoreSingle((unsigned long)p+2097152,0xfeefee); 
+
+  /* Test case 6: TLB cache functioning */
+
 
 
   unsigned accesses = vm->getNumAcc();
